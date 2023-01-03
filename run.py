@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import json
+import os
 
 clan_tag = "28L2UYYU"
 
@@ -23,13 +24,12 @@ headers = {
     'x-requested-with': 'XMLHttpRequest',
 }
 
-
 def get_names_df():
     url = f"https://royaleapi.com/clan/{clan_tag}"
     html = requests.get(url, headers=headers).content
     df = pd.read_html(html, encoding='utf-8')[0]
     
-    names = df["Name"].apply(lambda x: x.split("#")[0])
+    names = df["Name"].apply(lambda x: x.split("#")[0][:-1])
     player_ids = df["Name"].apply(lambda x: x.split("#")[1].split(" ")[0])
     df = pd.DataFrame({"Name": names, "Player_id": player_ids})
     return df
@@ -72,10 +72,29 @@ def add_cw_history(df):
 
     return df
 
-df = get_names_df()
-df = add_tokens(df)
-df = add_cw_history(df)
 
-import ipdb; ipdb.set_trace()
-a=3
+if __name__ == "__main__":
+    if not os.path.exists("stats.csv"):
+        df = get_names_df()
+        df = add_tokens(df)
+        df = add_cw_history(df)
+        df.to_csv("stats.csv", index=False, encoding="utf-8")
+    else:
+        df_old = pd.read_csv("stats.csv")
+        df_names = get_names_df()
+        df_old = df_old[:48] ##########
+        # get new players
+        df_new_players = df_old.merge(df_names, how="right", indicator=True)
+        df_new_players = df_new_players.query("_merge == 'right_only'")[["Name","Player_id"]]
+        if len(df_new_players) > 0:
+            df_new_players = add_tokens(df_new_players)
+            df_new_players = add_cw_history(df_new_players)
+            df_new = pd.concat([df_old, df_new_players])
+            #### Send whatsapp message
+            print(df_new_players)
+            df_new.to_csv("stats.csv", index=False, encoding="utf-8")
+        
+        
 
+    import ipdb; ipdb.set_trace()
+    a=3
