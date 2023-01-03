@@ -72,29 +72,29 @@ def add_cw_history(df):
 
     return df
 
-
+def create_df():
+    df = get_names_df()
+    df = add_tokens(df)
+    df = add_cw_history(df)
+    return df
+    
 if __name__ == "__main__":
     if not os.path.exists("stats.csv"):
-        df = get_names_df()
-        df = add_tokens(df)
-        df = add_cw_history(df)
+        df = create_df()
         df.to_csv("stats.csv", index=False, encoding="utf-8")
     else:
         df_old = pd.read_csv("stats.csv")
         df_names = get_names_df()
-        df_old = df_old[:48] ##########
         # get new players
         df_new_players = df_old.merge(df_names, how="right", indicator=True)
         df_new_players = df_new_players.query("_merge == 'right_only'")[["Name","Player_id"]]
         if len(df_new_players) > 0:
             df_new_players = add_tokens(df_new_players)
             df_new_players = add_cw_history(df_new_players)
-            df_new = pd.concat([df_old, df_new_players])
-            #### Send whatsapp message
+             #### Send whatsapp message
             print(df_new_players)
+            df_new = create_df()
             df_new.to_csv("stats.csv", index=False, encoding="utf-8")
-        
-        
 
     import ipdb; ipdb.set_trace()
     a=3
