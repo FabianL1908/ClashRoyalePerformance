@@ -95,6 +95,3 @@ if __name__ == "__main__":
             print(df_new_players)
             df_new = create_df()
             df_new.to_csv("stats.csv", index=False, encoding="utf-8")
-
-    import ipdb; ipdb.set_trace()
-    a=3
