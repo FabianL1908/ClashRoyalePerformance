@@ -1,8 +1,8 @@
-name: run main.py
+name: run clash royale performance tracker
 
-#on:
-#  schedule:
-#    - cron: '*/5 * * * *' # 
+on:
+  schedule:
+    - cron: '*/5 * * * *' # 
 
 jobs:
   build:
@@ -22,9 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           
-      - name: execute py script # run main.py
-        #env:
-        #  SOME_SECRET: ${{ secrets.SOME_SECRET }}
+      - name: execute py script # run run.py
+        env:
+          PHONE_NUMBER: ${{ secrets.PHONE_NUMBER }}
+          PHONE_NUMBER_ID: ${{ secrets.PHONE_NUMBER_ID }}
+          WHATSAPP_ACCESS_TOKEN: ${{ secrets.WHATSAPP_ACCESS_TOKEN }}
         run: python3 run.py
 
       - name: commit files

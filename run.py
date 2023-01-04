@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import json
 import os
+from heyoo import WhatsApp
+
 
 clan_tag = "28L2UYYU"
 
@@ -72,6 +74,13 @@ def add_cw_history(df):
 
     return df
 
+def send_whatsapp_message(message):
+    phone_number = os.environ["PHONE_NUMBER"]
+    phone_number_id = os.environ["PHONE_NUMBER_ID"]
+    access_token = os.environ["WHATSAPP_ACCESS_TOKEN"]
+    messenger = WhatsApp(access_token,phone_number_id=phone_number_id)
+    messenger.send_message(message, phone_number)    
+
 def create_df():
     df = get_names_df()
     df = add_tokens(df)
@@ -91,7 +100,12 @@ if __name__ == "__main__":
         if len(df_new_players) > 0:
             df_new_players = add_tokens(df_new_players)
             df_new_players = add_cw_history(df_new_players)
+            df_new_players = df_new_players.round({"max_5": 1, "max_20": 1, "mean_5": 1, "mean_20": 1})
              #### Send whatsapp message
-            print(df_new_players)
+            df_print = df_new_players[["Name", "max_5", "mean_20", "mean_5", "mean_20"]].to_string(index=False, header=False)
+            print(df_print)
+            
+            send_whatsapp_message(str(df_print))
             df_new = create_df()
             df_new.to_csv("stats.csv", index=False, encoding="utf-8")
+
