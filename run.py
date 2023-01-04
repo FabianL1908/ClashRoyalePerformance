@@ -30,8 +30,8 @@ def get_names_df():
     url = f"https://royaleapi.com/clan/{clan_tag}"
     html = requests.get(url, headers=headers).content
     df = pd.read_html(html, encoding='utf-8')[0]
-    
-    names = df["Name"].apply(lambda x: x.split("#")[0][:-1])
+
+    names = df["Name"].apply(lambda x: x.split("#")[0].rstrip())
     player_ids = df["Name"].apply(lambda x: x.split("#")[1].split(" ")[0])
     df = pd.DataFrame({"Name": names, "Player_id": player_ids})
     return df
@@ -104,7 +104,6 @@ if __name__ == "__main__":
              #### Send whatsapp message
             df_print = df_new_players[["Name", "max_5", "max_20", "mean_5", "mean_20"]].to_string(index=False, header=False)
             print(df_print)
-            import ipdb; ipdb.set_trace()
             
             send_whatsapp_message(str(df_print))
             df_new = create_df()
