@@ -102,8 +102,9 @@ if __name__ == "__main__":
             df_new_players = add_cw_history(df_new_players)
             df_new_players = df_new_players.round({"max_5": 1, "max_20": 1, "mean_5": 1, "mean_20": 1})
              #### Send whatsapp message
-            df_print = df_new_players[["Name", "max_5", "mean_20", "mean_5", "mean_20"]].to_string(index=False, header=False)
+            df_print = df_new_players[["Name", "max_5", "max_20", "mean_5", "mean_20"]].to_string(index=False, header=False)
             print(df_print)
+            import ipdb; ipdb.set_trace()
             
             send_whatsapp_message(str(df_print))
             df_new = create_df()
