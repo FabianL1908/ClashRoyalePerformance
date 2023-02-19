@@ -61,12 +61,18 @@ def add_cw_history(df):
         response = requests.post('https://royaleapi.com/data/player/cw2_history', headers=headers, data=data)
         my_dict = response.json()
         cw_df = pd.DataFrame(my_dict["rows"])
-        cw_df = cw_df[["log_date", "clan_league", "contribution"]]
-        maxs_5.append(cw_df["contribution"][:5].max())
-        maxs_20.append(cw_df["contribution"][:20].max())
-        mean_5.append(cw_df["contribution"][:5].mean())
-        mean_20.append(cw_df["contribution"][:20].mean())
-
+        try:
+            cw_df = cw_df[["log_date", "clan_league", "contribution"]]
+            maxs_5.append(cw_df["contribution"][:5].max())
+            maxs_20.append(cw_df["contribution"][:20].max())
+            mean_5.append(cw_df["contribution"][:5].mean())
+            mean_20.append(cw_df["contribution"][:20].mean())
+        except:
+            maxs_5.append(0)
+            maxs_20.append(0)
+            mean_5.append(0)
+            mean_20.append(0)
+        
     df["max_5"] = maxs_5
     df["max_20"] = maxs_20
     df["mean_5"] = mean_5
