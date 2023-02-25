@@ -9,20 +9,19 @@ clan_tag = "28L2UYYU"
 
 headers = {
     'authority': 'royaleapi.com',
-    'accept': 'application/json, text/javascript, */*; q=0.01',
+    'accept': '*/*',
     'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-    'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'origin': 'https://royaleapi.com',
-    'referer': 'https://royaleapi.com/player/20YL0G20V',
-    'sec-ch-ua': '"Not?A_Brand";v="8", "Chromium";v="108", "Google Chrome";v="108"',
+    'authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhbGxvdyI6ImluYyIsImV4cCI6MTY3NzM2MDA4N30.zPl8LF4P-a39o9XnWC1d6PNkN-tGvjKv_nDtwLjRRQ4',
+     'referer': 'https://royaleapi.com/player/YQ9882LCV',
+    'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"macOS"',
     'sec-fetch-dest': 'empty',
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
-    'traceparent': '00-cc2ec1d73cd13a17c1f490fd800c44e0-bf3081fde16842b9-01',
-    'tracestate': '2412609@nr=0-1-2412609-174388290-bf3081fde16842b9----1671480583081',
-    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+    'traceparent': '00-50b3244bfb8c42e4a4c924fdd2870d80-67093dad9d49ad8e-01',
+    'tracestate': '2412609@nr=0-1-2412609-174388290-67093dad9d49ad8e----1677356503254',
+    'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
 }
 
@@ -56,9 +55,8 @@ def add_cw_history(df):
     
     for index, row in df.iterrows():
         name, player_id, token = row
-        data = {"player_tag":f"{player_id}","player_name":f"{name}","token":f"{token}"}
-        data = json.dumps(data)
-        response = requests.post('https://royaleapi.com/data/player/cw2_history', headers=headers, data=data)
+        get_url = f"https://royaleapi.com/data/player/cw2_history/{player_id}?player_name={name}&clan_tag={clan_tag}"
+        response = requests.get(get_url, headers=headers)
         my_dict = response.json()
         cw_df = pd.DataFrame(my_dict["rows"])
         try:
@@ -114,4 +112,3 @@ if __name__ == "__main__":
             send_whatsapp_message(str(df_print))
             df_new = create_df()
             df_new.to_csv("stats.csv", index=False, encoding="utf-8")
-
