@@ -3,24 +3,25 @@ import pandas as pd
 import json
 import os
 from heyoo import WhatsApp
-
+import urllib
 
 clan_tag = "28L2UYYU"
+
 
 headers = {
     'authority': 'royaleapi.com',
     'accept': '*/*',
     'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-    'authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhbGxvdyI6ImluYyIsImV4cCI6MTY3NzM2MDA4N30.zPl8LF4P-a39o9XnWC1d6PNkN-tGvjKv_nDtwLjRRQ4',
-     'referer': 'https://royaleapi.com/player/YQ9882LCV',
+    'authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhbGxvdyI6ImluYyIsImV4cCI6MTY3NzQwNjUxMH0.ptH34u6Rvnq-kUxXhG_eV1b2lWvFvI9SiK9KUHlfgks',
+    'referer': 'https://royaleapi.com/player/CVC0JVR0P',
     'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"macOS"',
     'sec-fetch-dest': 'empty',
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
-    'traceparent': '00-50b3244bfb8c42e4a4c924fdd2870d80-67093dad9d49ad8e-01',
-    'tracestate': '2412609@nr=0-1-2412609-174388290-67093dad9d49ad8e----1677356503254',
+    'traceparent': '00-fb99bd0310e50a17c4492d15fe56c660-5eae009af788450a-01',
+    'tracestate': '2412609@nr=0-1-2412609-174388290-5eae009af788450a----1677402943145',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
 }
@@ -55,7 +56,11 @@ def add_cw_history(df):
     
     for index, row in df.iterrows():
         name, player_id, token = row
-        get_url = f"https://royaleapi.com/data/player/cw2_history/{player_id}?player_name={name}&clan_tag={clan_tag}"
+        # we have to double encode the player_name
+        encoded_name = urllib.parse.quote(name)
+        double_encoded_name = urllib.parse.quote(encoded_name)
+        get_url = f"https://royaleapi.com/player/cw2_history/{player_id}?player_name={double_encoded_name}&clan_tag={clan_tag}"
+#        print(get_url)
         response = requests.get(get_url, headers=headers)
         my_dict = response.json()
         cw_df = pd.DataFrame(my_dict["rows"])
