@@ -7,12 +7,10 @@ import urllib
 
 clan_tag = "28L2UYYU"
 
-
 headers = {
     'authority': 'royaleapi.com',
     'accept': '*/*',
     'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
-    'authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhbGxvdyI6ImluYyIsImV4cCI6MTY3NzQwNjUxMH0.ptH34u6Rvnq-kUxXhG_eV1b2lWvFvI9SiK9KUHlfgks',
     'referer': 'https://royaleapi.com/player/CVC0JVR0P',
     'sec-ch-ua': '"Not_A Brand";v="99", "Google Chrome";v="109", "Chromium";v="109"',
     'sec-ch-ua-mobile': '?0',
@@ -20,11 +18,18 @@ headers = {
     'sec-fetch-dest': 'empty',
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
-    'traceparent': '00-fb99bd0310e50a17c4492d15fe56c660-5eae009af788450a-01',
-    'tracestate': '2412609@nr=0-1-2412609-174388290-5eae009af788450a----1677402943145',
     'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36',
     'x-requested-with': 'XMLHttpRequest',
 }
+
+def get_bearer_token():
+    url = f"https://royaleapi.com/player/CVC0JVR0P"
+    html = requests.get(url, headers=headers).text
+    token = html.split("token:")[1].split("\n")[0].split("'")[1]
+    return token
+
+bearer_token = get_bearer_token()
+headers["authorization"] = f'Bearer {bearer_token}'
 
 def get_names_df():
     url = f"https://royaleapi.com/clan/{clan_tag}"
@@ -36,17 +41,6 @@ def get_names_df():
     df = pd.DataFrame({"Name": names, "Player_id": player_ids})
     return df
 
-def add_tokens(df):
-    tokens = []
-    for index, row in df.iterrows():
-        name, player_id = row
-        url = f"https://royaleapi.com/player/{player_id}"
-        html = requests.get(url, headers=headers).text
-        token = html.split("token:")[1].split("\n")[0].split("'")[1]
-        tokens.append(token)
-        break
-    df["Token"] = tokens[0]
-    return df
 
 def add_cw_history(df):
     maxs_5 = []
@@ -55,12 +49,12 @@ def add_cw_history(df):
     mean_20 = []
     
     for index, row in df.iterrows():
-        name, player_id, token = row
+        name, player_id = row
         # we have to double encode the player_name
         encoded_name = urllib.parse.quote(name)
         double_encoded_name = urllib.parse.quote(encoded_name)
         get_url = f"https://royaleapi.com/player/cw2_history/{player_id}?player_name={double_encoded_name}&clan_tag={clan_tag}"
-#        print(get_url)
+        #print(get_url)
         response = requests.get(get_url, headers=headers)
         my_dict = response.json()
         cw_df = pd.DataFrame(my_dict["rows"])
@@ -92,7 +86,6 @@ def send_whatsapp_message(message):
 
 def create_df():
     df = get_names_df()
-    df = add_tokens(df)
     df = add_cw_history(df)
     return df
     
@@ -107,7 +100,6 @@ if __name__ == "__main__":
         df_new_players = df_old.merge(df_names, how="right", indicator=True)
         df_new_players = df_new_players.query("_merge == 'right_only'")[["Name","Player_id"]]
         if len(df_new_players) > 0:
-            df_new_players = add_tokens(df_new_players)
             df_new_players = add_cw_history(df_new_players)
             df_new_players = df_new_players.round({"max_5": 1, "max_20": 1, "mean_5": 1, "mean_20": 1})
              #### Send whatsapp message
