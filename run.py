@@ -29,7 +29,7 @@ def get_bearer_token():
     try:
         token = html.split("token:")[1].split("\n")[0].split("'")[1]
     except IndexError:
-        sys.exit(0)
+        sys.exit()
     return token
 
 bearer_token = get_bearer_token()
