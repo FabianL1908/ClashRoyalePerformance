@@ -4,6 +4,7 @@ import json
 import os
 from heyoo import WhatsApp
 import urllib
+import sys
 
 clan_tag = "28L2UYYU"
 
@@ -28,7 +29,7 @@ def get_bearer_token():
     try:
         token = html.split("token:")[1].split("\n")[0].split("'")[1]
     except IndexError:
-        exit(0)
+        sys.exit(0)
     return token
 
 bearer_token = get_bearer_token()
