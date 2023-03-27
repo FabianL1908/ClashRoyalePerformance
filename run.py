@@ -25,7 +25,10 @@ headers = {
 def get_bearer_token():
     url = f"https://royaleapi.com/player/CVC0JVR0P"
     html = requests.get(url, headers=headers).text
-    token = html.split("token:")[1].split("\n")[0].split("'")[1]
+    try:
+        token = html.split("token:")[1].split("\n")[0].split("'")[1]
+    except IndexError:
+        exit(-1)
     return token
 
 bearer_token = get_bearer_token()
