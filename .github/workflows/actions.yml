@@ -2,7 +2,7 @@ name: run clash royale performance tracker
 
 on:
   schedule:
-    - cron: '*/10 7-23 * * *' # 
+    - xxxxxxxxcron: '*/10 7-23 * * *' # 
 
 jobs:
   build:
